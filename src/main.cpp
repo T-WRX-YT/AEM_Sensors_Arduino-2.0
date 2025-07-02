@@ -209,6 +209,6 @@ void loop(void) {
   */
 
   // in my case, this needs to be slower than the time it takes to run a loop on the teensy at the far end
-  delay(200);
+  delay(50);
 }
 
