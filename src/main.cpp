@@ -5,11 +5,10 @@
 
 
 #define SERIESRESISTOR 2200 // the value of the 'other' resistor
-#define THERMISTORPIN A6 // What pin to connect the sensor to
-#define PRESSUREPIN A4
+#define THERMISTORPIN A6 // what pin to connect the temperature sensor to
+#define PRESSUREPIN A4 // what pin to connect the pressure sensor to
 
-SoftwareSerial mySerial(A2, A3); // RX, TX
-
+SoftwareSerial mySerial(A2, A3); // RX, TX software serial to teensy
 
 const int sendSerial = 1;  // set whether to actually the results, for testing stuff
  
@@ -26,19 +25,19 @@ void setup(void) {
 
 void loop(void) {
 
-  // read A1, then convert it to voltage based on 5v source
+  // read #PRESSUREPIN, then convert it to voltage based on 5v source
   // using the AEM linear function for oil pressure, calculate the pressure value
   int sensorValue = analogRead(PRESSUREPIN);
   float voltage = sensorValue * (5.0 / 1023.0);
   int psi = (37.5*(voltage))-18.75;
 
-  // read A0 pin, then calculate the resistance based on 2.2k resistor
+  // read #THERMISTORPIN pin, then calculate the resistance based on 2.2k resistor
   float reading;
   reading = analogRead(THERMISTORPIN);
   reading = (1023 / reading)  - 1;     // (1023/ADC - 1) 
   reading = SERIESRESISTOR / reading;  // resistor / (1023/ADC - 1)
 
-  // arm is non-linear function, the best I could do is the middle using a function, the rest use a bunch of MAP()'s.  sue me
+  // aem is non-linear function, the best I could do is the middle using a function, the rest use a bunch of MAP()'s.  sue me
   // -40 - 140
   if (reading >= 2701) {
     //Serial.print("Manual mapping ");
