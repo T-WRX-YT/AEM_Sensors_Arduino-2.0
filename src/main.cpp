@@ -2,9 +2,11 @@
 #include <SoftwareSerial.h>
 #include <math.h>
 #include <Wire.h>
-// test
+
 
 #define SERIESRESISTOR 2200 // the value of the 'other' resistor
+#define DCCDINPUTPIN A3 // which pin the 5v input signal from the map dccd is connected to
+#define REARDIFFPIN A2 // what pin the rear diff dignal sensor is connected to
 #define THERMISTORPIN A1 // what pin to connect the temperature sensor to
 #define PRESSUREPIN A0 // what pin to connect the pressure sensor to
 #define SERIALSND A5 // what pin the sending signal is on
@@ -37,6 +39,17 @@ void loop(void) {
   float resistance = analogRead(THERMISTORPIN);
   resistance = (1023 / resistance)  - 1;     // (1023/ADC - 1)
   resistance = SERIESRESISTOR / resistance;  // resistor / (1023/ADC - 1)
+
+  float resistance2 = analogRead(REARDIFFPIN);
+  resistance2 = (1023 / resistance2)  - 1;     // (1023/ADC - 1)
+  resistance2 = SERIESRESISTOR / resistance2;  // resistor / (1023/ADC - 1)
+
+  // calculating the aem temp sensor temperature using ai generated polynomial, dont know if this will work
+  float x = log(resistance2);
+  float dTemp = ((-0.25057752f * x + 9.81514216f) * x - 157.22950552f) * x + 892.12702771f;
+  int diffTemperature = (int)round(dTemp);
+
+
 
   // aem is non-linear function, the best I could do is the middle using a function, the rest use a bunch of MAP()'s.  sue me
   float tempF;
@@ -185,14 +198,18 @@ void loop(void) {
   Serial.print(temperature);
   Serial.print(",");
   Serial.print("b");
-  Serial.println(psi);
+  Serial.print(psi);
+  Serial.print(",c");
+  Serial.println(diffTemperature);
   
   if (sendSerial) {
     mySerial.print("a");
     mySerial.print(temperature);
     mySerial.print(",");
     mySerial.print("b");
-    mySerial.println(psi);
+    mySerial.print(psi);
+    mySerial.print(",c");
+    mySerial.println(diffTemperature);
   }
 
 
