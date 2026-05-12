@@ -29,6 +29,12 @@ void setup(void) {
 
 void loop(void) {
 
+  // read the 5v signal sent by the MAP dccd controller
+  int dccdValue = analogRead(DCCDINPUTPIN);
+  float dccdVoltage = dccdValue * (5.0 / 1023.0);
+
+
+
   // read #PRESSUREPIN, then convert it to voltage based on 5v source
   // using the AEM linear function for oil pressure, calculate the pressure value
   int sensorValue = analogRead(PRESSUREPIN);
@@ -200,7 +206,9 @@ void loop(void) {
   Serial.print("b");
   Serial.print(psi);
   Serial.print(",c");
-  Serial.println(diffTemperature);
+  Serial.print(diffTemperature);
+  Serial.print(",d");
+  Serial.println(dccdVoltage);
   
   if (sendSerial) {
     mySerial.print("a");
@@ -209,7 +217,9 @@ void loop(void) {
     mySerial.print("b");
     mySerial.print(psi);
     mySerial.print(",c");
-    mySerial.println(diffTemperature);
+    mySerial.print(diffTemperature);
+    mySerial.print(",d");
+    mySerial.println(dccdVoltage);
   }
 
 
